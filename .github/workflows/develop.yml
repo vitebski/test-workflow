@@ -1,0 +1,56 @@
+# This is a basic workflow to help you get started with  Actions
+name: Manually triggered workflow
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+on:
+  workflow_dispatch:
+    inputs:
+      sm_environment:
+        description: 'SM Environment name'
+        required: true
+        default: 'app-qa'
+      branch_name:
+        description: 'UI Refresh branch name to build from'
+        required: true
+        default: 'develop'
+      version_number:
+        description: 'UI Refresh version'
+        required: true
+        default: '1.0.0'
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  build_application:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [12.x]
+    env:
+      ARTIFACT_VERSION: ${{ github.event.inputs.version_number }}-${{ github.run_id }}
+      ARTIFACT_NAME: sm-ui-refresh-${{ github.event.inputs.version_number }}-${{ github.run_id }}.tar.gz
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.inputs.branch_name }}
+      - run: |
+        echo "sm_environment - ${{ github.event.inputs.sm_environment }}"
+        echo "branch_name - ${{ github.event.inputs.branch_name }}"
+        echo "version_number - ${{ github.event.inputs.version_number }}"
+      # Runs a single command using the runners shell
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: npm Install
+        run: |
+          npm install
+      - name: Build app
+        run: |
+          CI=false npm run build
+      - name: Package tar.gz artifact
+        run: |
+          echo "packing build into: ${{env.ARTIFACT_NAME}}"
+          tar -cvf ${{env.ARTIFACT_NAME}} build/
+          ls ./ -l
+  
