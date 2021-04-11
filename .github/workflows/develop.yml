@@ -24,8 +24,6 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
       - run: |
-          echo "sm_environment - ${{ github.event.inputs.sm_environment }}"
-          echo "branch_name - ${{ github.event.inputs.branch_name }}"
           echo "version_number - ${{ github.event.inputs.version_number }}"
       # Runs a single command using the runners shell
       - name: Use Node.js ${{ matrix.node-version }}
