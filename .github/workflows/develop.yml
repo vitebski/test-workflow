@@ -5,14 +5,6 @@ name: Manually triggered workflow
 on:
   workflow_dispatch:
     inputs:
-      sm_environment:
-        description: 'SM Environment name'
-        required: true
-        default: 'app-qa'
-      branch_name:
-        description: 'UI Refresh branch name to build from'
-        required: true
-        default: 'develop'
       version_number:
         description: 'UI Refresh version'
         required: true
@@ -31,8 +23,6 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
-        with:
-          ref: ${{ github.event.inputs.branch_name }}
       - run: |
           echo "sm_environment - ${{ github.event.inputs.sm_environment }}"
           echo "branch_name - ${{ github.event.inputs.branch_name }}"
